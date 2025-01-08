@@ -3,9 +3,10 @@ package main
 import (
 	"encoding/xml"
 	"fmt"
-	"gopkg.in/telegram-bot-api.v4"
 	"io/ioutil"
 	"net/http"
+
+	tgbotapi "gopkg.in/telegram-bot-api.v4"
 )
 
 const (
