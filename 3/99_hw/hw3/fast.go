@@ -2,12 +2,13 @@ package main
 
 import (
 	"bufio"
-	"encoding/json"
 	"fmt"
 	"io"
 	"os"
 	"strings"
+
 	// "log"
+	"hw3/model"
 )
 
 var (
@@ -34,9 +35,8 @@ func FastSearch(out io.Writer) {
 			break
 		}
 
-		user := make(map[string]interface{})
-		err = json.Unmarshal(line, &user)
-		// user := &u.User{}
+		user := &model.User{}
+		err = user.UnmarshalJSON(line)
 		if err != nil {
 			panic(err)
 		}
@@ -44,18 +44,10 @@ func FastSearch(out io.Writer) {
 		isAndroid := false
 		isMSIE := false
 
-		browsers, ok := user["browsers"].([]interface{})
-		if !ok {
-			// log.Println("cant cast browsers")
-			continue
-		}
+		browsers := user.Browsers
+		// fmt.Println(browsers)
 
-		for _, browserRaw := range browsers {
-			browser, ok := browserRaw.(string)
-			if !ok {
-				// log.Println("cant cast browser to string")
-				continue
-			}
+		for _, browser := range browsers {
 			okAndroid, okMSIE := strings.Contains(browser, ANDROID), strings.Contains(browser, MSIE)
 			// fmt.Println(isAndroid, isMSIE, browser)
 			if okAndroid || okMSIE {
@@ -84,8 +76,8 @@ func FastSearch(out io.Writer) {
 		}
 
 		// log.Println("Android and MSIE user:", user["name"], user["email"])
-		email := strings.ReplaceAll(user["email"].(string), "@", " [at] ")
-		foundUsers += fmt.Sprintf("[%d] %s <%s>\n", idx, user["name"], email)
+		email := strings.ReplaceAll(user.Email, "@", " [at] ")
+		foundUsers += fmt.Sprintf("[%d] %s <%s>\n", idx, user.Name, email)
 	}
 
 	fmt.Fprintln(out, "found users:\n"+foundUsers)
